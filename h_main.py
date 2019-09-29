@@ -35,4 +35,4 @@ def main(path=None, conf_path=None, report_name=None):
 
 
 if __name__ == "__main__":
-    main("E:\jackstudy\ApiTestForHttp\data\project")
+    main("E:\jackstudy\ApiTestForHttp\data\custemor_V2.0")

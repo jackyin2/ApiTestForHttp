@@ -72,7 +72,12 @@ class NotFoundParams(MyExcepiton):
 
 
 class ParamsError(MyExcepiton):
-    pass
+    def __init__(self, p=None):
+        self.p = p
+
+    def __str__(self):
+        return ("{}".format(self.p))
+
 
 
 class EvalError(MyExcepiton):

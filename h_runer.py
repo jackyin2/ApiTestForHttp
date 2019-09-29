@@ -76,7 +76,8 @@ def runner(casebox):
         for case in apis:
             if tcase.casetype == "api":
                 print("###### api: {} ######".format(case.name))
-            print("###### step: {} ######".format(case.name))
+            else:
+                print("###### step: {} ######".format(case.name))
             try:
                 # 0 请求前参数准备
                 var = setup(case)
@@ -91,7 +92,6 @@ def runner(casebox):
                 if istrue:
                     case.result = True
                     case.time = runtime
-                    # tcase.caseresult = tcase.caseresult and case.result
                     tcase.caseresult = True
                     tcase.runtime = tcase.runtime + case.time
 
@@ -141,7 +141,7 @@ def runapi(case, var):
         else:
             _files = None
     except NotFoundParams as e:
-        raise ParamsError
+        raise ParamsError(e)
 
     # 执行请求
     try:
