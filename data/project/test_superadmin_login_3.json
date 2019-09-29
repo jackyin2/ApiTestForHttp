@@ -1,0 +1,77 @@
+{
+   "name": "测试登录场景",
+   "type": "scene",
+   "author": "王慧",
+   "date": "19/02/14",
+   "test": [
+     {
+     "name": "denglu1",
+
+     "setup": {
+       "num1":123,
+       "username": "tunicorn",
+       "data2": { "username": "${username}", "password": "123456"}
+     },
+
+     "requestor":{
+        "url": "${host}/device-mgr/api/auth/login",
+        "method": "POST",
+        "headers": {
+          "Content-Type": "application/json"
+       },
+        "data": "${data2}"
+     },
+
+     "validator": {
+       "assertEqCode": 200,
+       "assertEqHeaders": {"Content-Type": "application/json;charset=UTF-8"},
+       "assertEqStr": ["100000"],
+       "assertEqJson":{
+         "success":true
+       }
+     },
+
+     "collector":{
+       "json": {
+         "supertoken": "response.data.token"
+       }
+     },
+
+     "teardown":{}
+   },
+     {
+     "name": "denglu2",
+
+     "setup": {
+       "num1":123,
+       "username": "tunicorn",
+       "data2": { "username": "${username}", "password": "123456"}
+     },
+
+     "requestor":{
+        "url": "${host}/device-mgr/api/auth/login",
+        "method": "POST",
+        "headers": {
+          "Content-Type": "application/json"
+       },
+        "data": "${data2}"
+     },
+
+     "validator": {
+       "assertEqCode": 200,
+       "assertEqHeaders": {"Content-Type": "application/json;charset=UTF-8"},
+       "assertEqStr": ["100000"],
+       "assertEqJson":{
+         "success":true
+       }
+     },
+
+     "collector":{
+       "json": {
+         "supertoken": "response.data.token"
+       }
+     },
+
+     "teardown":{}
+   }]
+}

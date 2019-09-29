@@ -1,0 +1,102 @@
+{
+  "name": "测试登录场景",
+   "type": "scene",
+   "author": "王慧",
+   "date": "19/02/14",
+   "test": [
+     {
+     "name": "login_commuity_with_jack_中文",
+     "setup": {
+        "num1": 123,
+        "str1": "anc",
+        "fun1": "${__get_value(a=1, b=2)}",
+        "fun2": "${__get_value('success')}",
+        "str2": "jack2${str1}",
+        "fun3": "${__get_value(${num1}, '${str1}', '${str2}')}",
+        "path": "E:\\jackstudy\\test\\test_params.py",
+        "dict": {"a":"${str1}"},
+        "dict-list": {
+          "a": "${num1}",
+          "b": "${str1}",
+          "c": "abc${num1}",
+          "areaCodes": ["${num1}","${str1}","abc${num1}"],
+          "street": {"aa": "${num1}","bb": "${str1}"}
+        },
+        "list": ["A${num1}", 2]
+
+     },
+
+     "requestor":{
+        "url": "${host}/mccemv/device-mgr/api/auth/login",
+        "method": "POST",
+        "headers": {"Content-Type": "application/json"},
+       "data": "${dict-list}",
+       "files":{"image":"${path}"}
+     },
+
+     "validator": {
+       "assertEqCode": 299,
+       "assertEqHeaders": {"Content-Type": "application/json;charset=UTF-8"},
+       "assertEqStr": ["100000"],
+       "assertEqJson":{"success":true}
+     },
+
+     "collector":{
+       "json": {"token": "response.data.token"},
+       "methods": {"deleteid": "${__sql_select('${sql}', '${confpath}')}"},
+       "values":{"deleteid2": "${num1}"}
+     },
+
+     "teardown":{}
+   },
+     {
+     "name": "login_commuity_with_jack_中文",
+     "setup": {
+        "num1": 123,
+        "str1": "anc",
+        "fun1": "${__get_value(a=1, b=2)}",
+        "fun2": "${__get_value('success')}",
+        "str2": "jack2${str1}",
+        "fun3": "${__get_value(${num1}, '${str1}', '${str2}')}",
+        "path": "E:\\jackstudy\\test\\test_params.py",
+        "dict": {"a":"${str1}"},
+        "dict-list": {
+          "a": "${num1}",
+          "b": "${str1}",
+          "c": "abc${num1}",
+          "areaCodes": ["${num1}","${str1}","abc${num1}"],
+          "street": {"aa": "${num1}","bb": "${str1}"}
+        },
+        "list": ["A${num1}", 2]
+
+     },
+
+     "requestor":{
+        "url": "${host}/mccemv/device-mgr/api/auth/login",
+        "method": "POST",
+        "headers": {"Content-Type": "application/json"},
+       "data": "${dict-list}",
+       "files":{"image":"${path}"}
+     },
+
+     "validator": {
+       "assertEqCode": 299,
+       "assertEqHeaders": {"Content-Type": "application/json;charset=UTF-8"},
+       "assertEqStr": ["100000"],
+       "assertEqJson":{"success":true}
+     },
+
+     "collector":{
+       "json": {"token": "response.data.token"},
+       "methods": {"deleteid": "${__sql_select('${sql}', '${confpath}')}"},
+       "values":{"deleteid2": "${num1}"}
+     },
+
+     "teardown":{
+       "clear_cookies": "clearcookies",
+       "clearsession": "clearsession",
+       "cleartoken": "cleartoken"
+     }
+   }
+   ]
+}

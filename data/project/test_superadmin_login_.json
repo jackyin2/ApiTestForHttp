@@ -1,0 +1,41 @@
+{
+   "name": "测试登录场景",
+   "type": "api",
+   "author": "王慧",
+   "date": "19/02/14",
+   "test": [{
+     "name": "login_commuity_with_tunicorn_中文",
+
+     "setup": {
+       "num1":123,
+       "username": "tunicorn",
+       "data2": { "username": "${username}", "password": "123456"}
+     },
+
+     "requestor":{
+        "url": "${host}/device-mgr/api/auth/login",
+        "method": "POST",
+        "headers": {
+          "Content-Type": "application/json"
+       },
+        "data": "${data2}"
+     },
+
+     "validator": {
+       "assertEqCode": 200,
+       "assertEqHeaders": {"Content-Type": "application/json;charset=UTF-8"},
+       "assertEqStr": ["100000"],
+       "assertEqJson":{
+         "success":true
+       }
+     },
+
+     "collector":{
+       "json": {
+         "supertoken": "response.data.token"
+       }
+     },
+
+     "teardown":{}
+   }]
+}

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Bootstrap 实例 - 上下文类</title>
+    <h1 style="text-align: center">API-Report</h1>
+
+    <link href="//cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="http://echarts.baidu.com/dist/echarts.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-5">
+            <ul class="list-group">
+                <li class="list-group-item"><span>失败文件/总文件个数: </span><span class="label label-primary">{{ error_count }} / {{ files_count }} </span></li>
+                <li class="list-group-item"><span>总用例数: {{all}}</span></li>
+                <li class="list-group-item"><span>成功用例数: {{success}}</span></li>
+                <li class="list-group-item"><span>失败用例个数: {{fail}} </span></li>
+                <li class="list-group-item"><span>平均响应时间: {{avgtime}} </span></li>
+                <li class="list-group-item"><span>最小响应时间: {{mintime}} </span></li>
+                <li class="list-group-item"><span>最大响应时间: {{maxtime}} </span>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-5" style="border: 1px;">
+            <div id="main" style="width: 400px;height: 300px;"></div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <table class="table">
+            <caption>API 结果列表</caption>
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>所属文件</th>
+                <th>用例名称</th>
+                <th>用例类型</th>
+                <th>用例步骤数</th>
+                <th>执行结果</th>
+                <th>执行时间</th>
+                <th>执行信息</th>
+                <th>提交人</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for m in all_message %}
+            {% if m.caseresult %}
+            <tr class="success">
+                <td>{{ loop.index }}</td>
+                <td>{{ m.filename }}</td>
+                <td>{{ m.casename }}</td>
+                <td>{{ m.casetype }}</td>
+                <td>{{ m.casestep|length }}</td>
+                <td>{{ m.caseresult }}</td>
+                <td>{{ m.runtime }}</td>
+                <td>{{ m.casemessage }}</td>
+                <td>{{ m.provider }}</td>
+            </tr>
+            {% else %}
+            <tr class="active">
+                <td>{{ loop.index }}</td>
+                <td>{{ m.filename }}</td>
+                <td>{{ m.casename }}</td>
+                <td>{{ m.casetype }}</td>
+                <td>{{ m.casestep|length }}</td>
+                <td>{{ m.caseresult }}</td>
+                <td>{{ m.runtime }}</td>
+                <td>{{ m.casemessage }}</td>
+                <td>{{ m.provider }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script>
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+    var success = "{{ success }}";
+    var fail = "{{ fail }}";
+    var error = "{{ error_count }}";
+    // 指定图表的配置项和数据
+    var option_pie = {
+        title: {
+            text: '用例执行情况占比',
+            subtext: '',
+            x: 'center'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            data: ['成功', '失败', '异常']
+        },
+        series: [
+            {
+                name: '访问来源',
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '60%'],
+                data: [
+                    {value: success, name: '成功'},
+                    {value: fail, name: '失败'},
+                    {value: error, name: '异常'}
+
+                ],
+                itemStyle: {
+                    emphasis: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    },
+                    normal:{
+                         color:function(params) {
+                         //自定义颜色
+                         var colorList = [
+                              '#00EE00',
+                              '#C1232B',
+                              '#F4E001'
+                             ];
+                             return colorList[params.dataIndex]
+                          }
+                    }
+                }
+            }
+        ]
+    };
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option_pie);
+</script>
+<script>
+    $(function () {
+	$("[data-toggle='popover']").popover();
+});
+</script>
+</body>
+</html>
