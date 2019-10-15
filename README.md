@@ -1,71 +1,49 @@
 # ApiTestForHttp
 一款用于测试部门协作进行接口测试的小框架，主要适用于冒烟测试和回归测试，支持单接口和多接口场景流程测试
 
+####项目目录篇：
+![image.png](https://upload-images.jianshu.io/upload_images/17968751-46258ca4d5d48c53.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+如上图所示主要包含以下结构和内容
+1. project  项目根目录
+2. InitConf.ini   项目配置文件
+3. test_xxxxx.json  实际的测试json文件
+**一般情况下，登录成功的脚本case一般需要房子project的目录下，这样可以优先登录成功并提取相关登录信息给其他依赖权限的接口使用**
 
-**前言**
+####初始化配置篇
+![image.png](https://upload-images.jianshu.io/upload_images/17968751-16ca3286fee9a62d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+1. 如果存在多数据库，需要在配置文件中，如上图所示按照DB1 DB2 DB3来进行设置
 
-个人一个普通的测试人员，一直在从事业务测试和项目管理方面的工作，随着时代的发展，测试这个职业也在快速升级中，更高的要求也在激励着我往更深一层次去发展，锻炼自己开发这个脚本框架目的只有一个，我没有那么高的职业理想，仅仅希望自己不被市场淘汰，也许不完美，但是我努力过，所以基于公司的前后端分离项目为背景，我尝试开发了一套接口测试框架
- 
-**1 框架简介**
- 
-本框架是基于py3进行开发，功能方面目前主要解决的是前后端分离框架下的普通http协议的接口相关的测试。
-    
-**2 设计思路**
- 
-1. 首先设计的灵感是基于unittest的框架的case管理方式
-
-2. 其次基于jmeter中的提取器和验证器的设计思路
-
-3. debugtalk大神的json、yaml的管理方式
-
-当然（小私心就是锻炼锻炼自己的代码能力，虽然不咋地）
-
-**功能介绍**
-
-    1. 支持参数化（参数， 方法，方法入参），
-    2. 支持自定义方法
-    3. 支持接口的返回验证及结果自动提取
-    4. 支持自定义错误异常的收集和返回
-    5. 支持命令行执行
-    6. 支持api测试报告的自动生成和结果统计
-    7. 支持http协议下常用（get， post， patch，Put，delete）
-
-**测试样本**
+####json编写篇
 ```
-{
-   "test": [{
+     {
      "name": "login_commuity_with_jack_中文",
-
      "setup": {
-       "num1": 123,
+        "num1": 123,
         "str1": "anc",
         "fun1": "${__get_value(a=1, b=2)}",
         "fun2": "${__get_value('success')}",
         "str2": "jack2${str1}",
-        "fun3": "${__get_value(${num1}, ${str1}, '${str2}')}",
+        "fun3": "${__get_value(${num1}, '${str1}', '${str2}')}",   # 注意1  方法参数化如果入参是字符串，需要加两个单引号
         "path": "E:\\jackstudy\\test\\test_params.py",
         "dict": {"a":"${str1}"},
         "dict-list": {
-          "a": "${num1}",
+          "c" : "-${num1}" ,   # 注意2  对于字典或者列表中某一个value需要获取某一个int值转为str类型显示时，在前面加“-” or “~”
+          "a": "${num1}", # 注意4 对于字段为非确定数据类型， a会获取num1的自带int类型，b会自动获取str1中的str类型
           "b": "${str1}",
           "c": "abc${num1}",
           "areaCodes": ["${num1}","${str1}","abc${num1}"],
-          "street": {"aa": "${num1}","bb": "${str1}"},
+          "street": {"aa": "${num1}","bb": "${str1}"}
         },
-        "list": ["A${num1}", 2]
+        "list": ["A${num1}", 2]            # 注意3  对于字典或者列表中某一个value中部分需要获取某一个int值转为str类型显示，框架会自动判断进行合并
+
      },
 
      "requestor":{
-        "url": "${host}/mccemv/device-mgr/api/auth/login",
+        "url": "${host}/mccemv/mgr/api/auth/login",
         "method": "POST",
-        "headers": {
-          "Content-Type": "application/json"
-       },
-        "data": { "username": "${username}", "password": "111111"},
-        "files":{
-            "image1":"path",
-            "image2":"path2"
-        }
+        "headers": {"Content-Type": "application/json"},
+       "data": "${dict-list}",
+       "files":{"image":"${path}"}
      },
 
      "validator": {
@@ -77,7 +55,8 @@
 
      "collector":{
        "json": {"token": "response.data.token"},
-       "methods": {"deleteid": "${__sql_select('${sql}', '${confpath}')}"}
+       "methods": {"deleteid": "${__sql_select('${sql}', '${confpath}')}"},
+       "values":{"deleteid2": "${num1}"}
      },
 
      "teardown":{
@@ -85,68 +64,35 @@
        "clearsession": "clearsession",
        "cleartoken": "cleartoken"
      }
-   }]
-}
-
-简单谈下各部分的意义：
-"test": 表示的时当前为一个需要测试的用例或者用例列表
-"name": 本次测试用例用例的功能描述
-"setup": 预设case执行前的预设条件
-"requestor": api的主要核心部分
-"validator": 检验器，用例case的执行完毕后结构校验
-"collector": 收集器，主要针对将结果中重要信息回收给其他用例使用
-"teardown": 回收，主要是销毁setup中的相关内容，减少垃圾
+   }
 ```
-目前支持的方法（可自定义）：
-      
-    1. get_random_num(min, max, len=None) 任意生成随机数字
-    2. get_random_str(str, num=None) 从str中任意字符随机组合num长度新字符
-    3. sql_select(sql, path,  db=1)  同执行conf文件中，执行sql，获取单个值
+> 参数化原则：
+1 对于参数化后非确定类型，必须进行类型转换时， 需要在参数化标记$前增加一个“”-“” - **参考注意2**
+2 对于字典或者列表字段为str类型时，不需要做类型转换，框架会自动完成 - **参考注意3**
+3 对于字典或者列表中字段值为非确定数据类型，参数会保留参数化字段的原有type进行替换 - **参考注意4**
+4 对于方法类的str类型进行参数化时，需要人工确定传值是数值还是字符串，如果是字符串需要人工增加单引号 - **参考注意1**
 
-case编写注意事项：
+####框架执行篇
+#####命令行模式
+![image.png](https://upload-images.jianshu.io/upload_images/17968751-2b4e4a46ef6379fb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-1. 目前case仅支持json文件格式，不支持yaml等
+执行整个项目: **python3 api_test.py -p E:\jackstudy\ApiTestForHttp\data\project**
 
-2. setupcase中，定义的参数化需要按照直接赋值 < 方法赋值（不带入参参数化） < 方法赋值（带入参参数化）的顺序进行编写
+执行单个文件：**python3 api_test.py -p E:\test_.json -cf E:\data\conf**
 
-3. setupcase中，入参需要参数化的方法，如果入参是一个str类型，那么需要加上单引号
+####报告生成篇
+通过命令行执行报告后，查看执行窗口报告生成情况，如下图
+![image.png](https://upload-images.jianshu.io/upload_images/17968751-fab8af09e36a2dfe.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-4. 项目结构必须按照：
-    ![Image 项目结构](./templeate/static/QQ截图20190917101143.jpg)
-
-5. 用例命名规范 可参考unittest的方式，test_id_method_desc_other.json
-
-暂不支持：
-
-```
-1. 缺少log文件的输出，只能通过控制台查看执行过程
-```
-
-**如何开始？**
-
-1. 新建项目结构
-
-    在本地任意目录结构下新建如下图的项目
-    
-    ![Image 项目结构](./templeate/static/QQ截图20190917101143.jpg)
-    
-    新建项目中必须将logincase放置在项目节点下，同时同级中新建InitConf.ini配置文件
-
-2. 编写case json文件，可参考案例
-
-3. 编写用例后，可以进行单json调试：
-
-    使用命令 python let_api.py -d 当前项目的路径 -f json文件路径 -r 生成report的名称(默认自动生成如果希望结果覆盖可填写) -c 是否加载配置文件（1/0）
-    
-    eg： python3 let_api.py -d E:\jackstudy\LetApiRun\data\custemor -f E:\jackstudy\LetApiRun\data\custem
-or\superadmin\小区管理\数据看板\test_post_查询小区功能.json -r apireport.html -c 1
+框架report目录下报告如下：
+![image.png](https://upload-images.jianshu.io/upload_images/17968751-4a4086ae66d5d51c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
-4. 单文件调试成功后，进行项目整体执行
 
-    使用命令 python let_api.py -d 当前项目的路径
-    
-5. 查看报告
-    
-    report文件下查看report.html文件
-    ![Image 项目结构](./templeate/static/report.jpg)
+>欢迎各位体验，体验入口：[https://github.com/jackyin2/ApiTestForHttp](https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2Fjackyin2%2FApiTestForHttp)
+
+
+
+  
+
+
