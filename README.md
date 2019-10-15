@@ -36,7 +36,7 @@
    "test": [{
      "name": "login_commuity_with_jack_中文",
 
-     "setupcase": {
+     "setup": {
        "num1": 123,
         "str1": "anc",
         "fun1": "${__get_value(a=1, b=2)}",
@@ -80,7 +80,7 @@
        "methods": {"deleteid": "${__sql_select('${sql}', '${confpath}')}"}
      },
 
-     "teardowncase":{
+     "teardown":{
        "clear_cookies": "clearcookies",
        "clearsession": "clearsession",
        "cleartoken": "cleartoken"
@@ -91,11 +91,11 @@
 简单谈下各部分的意义：
 "test": 表示的时当前为一个需要测试的用例或者用例列表
 "name": 本次测试用例用例的功能描述
-"setupcase": 预设case执行前的预设条件
+"setup": 预设case执行前的预设条件
 "requestor": api的主要核心部分
 "validator": 检验器，用例case的执行完毕后结构校验
 "collector": 收集器，主要针对将结果中重要信息回收给其他用例使用
-"teardowncase": 回收，主要是销毁setup中的相关内容，减少垃圾
+"teardown": 回收，主要是销毁setup中的相关内容，减少垃圾
 ```
 目前支持的方法（可自定义）：
       
