@@ -7,7 +7,7 @@
 1. project  项目根目录
 2. InitConf.ini   项目配置文件
 3. test_xxxxx.json  实际的测试json文件
-**一般情况下，登录成功的脚本case一般需要房子project的目录下，这样可以优先登录成功并提取相关登录信息给其他依赖权限的接口使用**
+**一般情况下，登录成功的脚本case一般需要放置在project的目录下，这样可以优先登录成功并提取相关登录信息给其他依赖权限的接口使用**
 
 ####初始化配置篇
 ![image.png](https://upload-images.jianshu.io/upload_images/17968751-16ca3286fee9a62d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
