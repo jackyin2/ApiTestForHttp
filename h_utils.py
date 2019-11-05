@@ -12,8 +12,9 @@ import base64
 import pymysql
 import os
 import random
-from h_exception import NotFoundParams
+from h_exception import NotFoundParams, MySqlError
 from h_parser  import ParserConf
+from h_log import logO
 
 
 def strclass(cls):
@@ -152,7 +153,7 @@ def parameters(obj, var, valuepools):
             elif var.get(i) is not None and valuepools.get(i) is not None:
                 obj = obj.replace(r_str, str(var[i]))
             else:
-                print("var|valuePool中不存在需要的参数{}".format(i))
+                # print("var|valuePool中不存在需要的参数{}".format(i))
                 raise NotFoundParams(i)
     elif isinstance(obj, list):
         l = 0
@@ -319,7 +320,8 @@ def sql_select(sql, path, db=1, index=0):
         rows = cursor.execute(sql)
         result = cursor.fetchone()
     except Exception as e:
-        print("sql执行错误,请检查sql exception: {}".format(e))
+        # logO.debug("sql执行错误,请检查sql exception: {}".format(e))
+        raise MySqlError
     cursor.close()
     conn.close()
     return result[index]

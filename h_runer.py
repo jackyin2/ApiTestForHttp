@@ -17,6 +17,7 @@ from h_init import CASE_BOX, GENARATE_RESULT, VALUE_POOLS
 from h_parser import ParserConf
 from h_exception import *
 from h_assert import *
+from h_log import logO
 
 
 # 装饰器
@@ -66,18 +67,19 @@ def runner(casebox):
         count += 1
         # 0 判断文件读取失败的记录
         if tcase.casemessage == "JsonFileReadFail":
-            print("*****当前执行第 {} 个 case：{}, message: {}********".format(count, tcase.filename, tcase.casemessage))
+            logO.info("*****当前执行第 {} 个 case：{}, message: {}********".format(count, tcase.filename, tcase.casemessage))
+
             # GENARATE_RESULT.append(tcase)
             continue
 
         # 1 正常读取文件，执行case
-        print("*****当前执行第 {} 个 file:{}  case：{}********".format(count, tcase.filename, tcase.casename))
+        logO.info("*****当前执行第 {} 个 file:{}  case：{}********".format(count, tcase.filename, tcase.casename))
         apis = tcase.casestep
         for case in apis:
             if tcase.casetype == "api":
-                print("###### api: {} ######".format(case.name))
+                logO.info("###### api: {} ######".format(case.name))
             else:
-                print("###### step: {} ######".format(case.name))
+                logO.info("###### step: {} ######".format(case.name))
             try:
                 # 0 请求前参数准备
                 var = setup(case)
@@ -101,7 +103,7 @@ def runner(casebox):
                 # 4 清理var
                 teardown(var)
             except Exception as e:
-                print("fail")
+                logO.debug("error : {}".format(e))
                 case.response = e
                 tcase.casemessage = e
                 break
@@ -109,12 +111,6 @@ def runner(casebox):
             else:
                 case.collect = True
 
-
-
-
-
-
-        # GENARATE_RESULT.append(tcase)
 
 @take_up_time
 def runapi(case, var):
@@ -125,7 +121,6 @@ def runapi(case, var):
     :param v_setup: 
     :return: 
     """
-    print("2: runapi > ", end="")
     _request = case.request
     try:
         url = parameters(_request["url"], var, VALUE_POOLS)
@@ -141,6 +136,7 @@ def runapi(case, var):
         else:
             _files = None
     except NotFoundParams as e:
+        logO.error("2: runapi > error: {}".format(e))
         raise ParamsError(e)
 
     # 执行请求
@@ -154,9 +150,9 @@ def runapi(case, var):
                 re = requests.request(method=method, url=url, data=data, files=_files, headers=headers, timeout=2)
     except Exception as e:
         re = None
-        print("error:", e)
+        logO.error("2: runapi > error: {}".format(e))
         raise RequestError(e)
-    print("ok")
+    logO.info("2: runapi > ok")
     return re
 
 
@@ -167,9 +163,8 @@ def validate(case, re):
     :param re: 
     :return: 
     """
-    print("3: validate > ", end="")
     if re is None:
-        print("fail")
+        logO.info("3: validate >  fail")
         return False
 
     val = case.validate
@@ -183,10 +178,10 @@ def validate(case, re):
     if assertEqJson(re, val):
         count += 1
     if count >= len(val):
-        print("true")
+        logO.info("3: validate >  True")
         return True
     if count < len(val):
-        print("false")
+        logO.info("3: validate >  False")
     return False
 
 
@@ -198,12 +193,12 @@ def collect(case, re, var):
     :param var: 
     :return: 
     """
-    print("4: collect > ", end="")
+
     coll = case.collect
     try:
         response = json.loads(re.text)
     except Exception as e:
-        print("解析{}json格式错误,错误信息{}".format(re, e))
+        logO.error("4: collect > 解析{}json格式错误,错误信息{}".format(re, e))
         raise NotJsonError(re.text)
         # return False
 
@@ -232,14 +227,13 @@ def collect(case, re, var):
         elif k == "values":
             for k3, v3 in v.items():
                 VALUE_POOLS[k3] = parameters(v3, var, VALUE_POOLS)
-    print("ok")
+    logO.info("4: collect > ok")
 
 
 def teardown(var):
-    print("5: teardown > ", end="")
     if len(var) > 0:
         clear_value(var)
-        print("ok")
+        logO.info("5: teardown > ok")
     return
 
 
@@ -254,7 +248,7 @@ def setup(case):
     :param case: 
     :return: 
     """
-    print("1: setup > ", end='')
+
     vals = case.setup
     _vals = {}
     # 1 首先_vals先加载方法中不存在$的方法和正常的值
@@ -286,11 +280,14 @@ def setup(case):
             if method and is_params(method):
                 method = parameters(method, _vals, VALUE_POOLS)
                 _vals[k] = eval(method)
-    except NotFoundParams:
-        print("fail")
+    except NotFoundParams as e:
+        logO.error("1: setup > error {}".format(e))
         raise ParamsError
+    except MySqlError as e:
+        logO.error("1: setup > error {}".format(e))
+        raise MySqlError
 
-    print("ok")
+    logO.info("1: setup > ok")
     return _vals
 
 

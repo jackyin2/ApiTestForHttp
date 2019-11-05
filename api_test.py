@@ -6,14 +6,7 @@
 @Date  : 2019/9/27
 @Des   :
 """
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-"""
-@File  : cmd.py.py
-@Author: JACK
-@Date  : 2019/9/19
-@Des   :
-"""
+
 import argparse
 from h_main import *
 from h_utils import check_json, is_path

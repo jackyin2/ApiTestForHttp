@@ -10,6 +10,7 @@
 import time, datetime
 from jinja2 import Template
 from h_init import GENARATE_RESULT, CASE_BOX
+from h_log import logO
 
 
 class Reportor(object):
@@ -33,7 +34,7 @@ class Reportor(object):
         return report_name
 
     def _read_template(self):
-        print("1： read_report")
+        logO.info("1： read_report")
         with open(self.template, 'r', encoding='UTF-8') as f:
             t = f.read()
             tp = Template(t)
@@ -50,7 +51,7 @@ class Reportor(object):
         return self.r
 
     def _new_report(self):
-        print("2： report-success")
+        logO.info("2： report-success")
         with open("./report/"+self.report_name, 'w', encoding="utf8") as f:
             f.write(self.r)
 
@@ -124,7 +125,7 @@ class HtmlReportor(Reportor):
         super(HtmlReportor,self).__init__(report_name, type)
 
     def report(self):
-        print("*********report*******")
+        logO.info("*********report*******")
         self._report()
 
 

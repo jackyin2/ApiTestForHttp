@@ -103,3 +103,6 @@ class TimeOutError(RequestError):
     def __str__(self):
         return ("exception：{}, request timeout： {}".format(
             self.__class__.__name__, self.a))
+
+class MySqlError(Exception):
+    pass
