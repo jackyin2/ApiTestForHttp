@@ -11,6 +11,17 @@
 
 
 import logging
+import sys
+import os
+
+path = os.path.abspath(__file__).split('\\')
+path.pop()
+path = '\\'.join(path)
+# path = os.getcwd()
+# path = os.path.abspath(os.curdir)
+
+logpath = os.path.join(path, "log\\log.txt")
+
 # logging.basicConfig(level=logging.DEBUG,
 #                     format="%(asctime)s %(name)s %(levelname)s %(message)s",
 #                     datefmt = '%Y-%m-%d  %H:%M:%S %a',    #注意月份和天数不要搞乱了，这里的格式化符与time模块相同
@@ -30,7 +41,7 @@ def log():
 
     # 判断是否有handlers
     if not logger.handlers:
-        filehandler = logging.FileHandler("./log/log.txt", encoding='utf-8')
+        filehandler = logging.FileHandler(logpath, encoding='utf-8')
         cmdhandler = logging.StreamHandler()
 
         # 设置输出日志格式

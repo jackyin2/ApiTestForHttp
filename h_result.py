@@ -11,14 +11,20 @@ import time, datetime
 from jinja2 import Template
 from h_init import GENARATE_RESULT, CASE_BOX
 from h_log import logO
+import os
 
+
+path = os.path.abspath(__file__).split('\\')
+path.pop()
+path = '\\'.join(path)
+templatepath = os.path.join(path, "template/report_template.html")
 
 class Reportor(object):
     """
     report生成器
     """
     def __init__(self,  report_name=None, type=None, genarate_result=GENARATE_RESULT):
-        self.template = "./template/report_template.html"
+        self.template = templatepath
         self.genarate_result = genarate_result
         if report_name is None:
             self.report_name = self._make_report_name()
@@ -52,7 +58,7 @@ class Reportor(object):
 
     def _new_report(self):
         logO.info("2： report-success")
-        with open("./report/"+self.report_name, 'w', encoding="utf8") as f:
+        with open(path + "./report/"+self.report_name, 'w', encoding="utf8") as f:
             f.write(self.r)
 
     def _is_report(self):
