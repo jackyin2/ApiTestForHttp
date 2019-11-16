@@ -18,6 +18,7 @@ parser.add_argument("-p", "--path", help="测试内容，可以是文件也可�
 parser.add_argument("-cf", "--conf", help="配置文件路径", type=str, default=None)
 parser.add_argument("-r", "--report", help="测试报告", type=str)
 parser.add_argument("-CK", "--check", help="json文件检查", type=int, default=0)
+print(111111)
 args = parser.parse_args()
 if not is_path(args.path):
     print("is not a true path ,please check! ")
@@ -29,3 +30,5 @@ elif args.check == 1:
     check_json(args.dir)
     exit(0)
 main(path=args.path, conf_path=args.conf, report_name=args.report)
+
+
