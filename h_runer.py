@@ -45,12 +45,11 @@ def requests_retry(times=3):
                     logO.error("num {} retry  requests : {}".format(i+1, parameters(case.request["url"], var, VALUE_POOLS)))
                     t -= 1
                     i += 1
-                    # f = None
+                    f = None
                     if i == times:
                         raise RequestError(e)
                 else:
                     t = 0
-
             return f
         return inner
     return decorater
