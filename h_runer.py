@@ -31,6 +31,31 @@ def take_up_time(func):
         return f, round(t, 4)
     return warpper
 
+# api请求重试
+def requests_retry(times=3):
+    def decorater(func):
+        def inner(*args, **kwargs):
+            case, var = args
+            t = times
+            i = 0
+            while t:
+                try:
+                    f = func(*args, **kwargs)
+                except RequestError as e :
+                    logO.error("num {} retry  requests : {}".format(i+1, parameters(case.request["url"], var, VALUE_POOLS)))
+                    t -= 1
+                    i += 1
+                    # f = None
+                    if i == times:
+                        raise RequestError(e)
+                else:
+                    t = 0
+
+            return f
+        return inner
+    return decorater
+
+
 
 def init_g_variable(test_dir):
     # 初始化加载全局配置
@@ -80,6 +105,7 @@ def runner(casebox):
                 logO.info("###### api: {} ######".format(case.name))
             else:
                 logO.info("###### step: {} ######".format(case.name))
+
             try:
                 # 0 请求前参数准备
                 var = setup(case)
@@ -112,7 +138,9 @@ def runner(casebox):
                 case.collect = True
 
 
+
 @take_up_time
+@requests_retry(times=3)
 def runapi(case, var):
     """
     执行api，返回请求内容
